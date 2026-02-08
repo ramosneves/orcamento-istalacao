@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ninite Mobile - Orçamento</title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<style>
+    /* --- CSS VARIABLES --- */
+    :root {
+        --bg-color: #121212;
+        --text-color: #ffffff;
+        --card-bg: #1e1e1e;
+        --border-color: #333;
+        --header-bg: #3054bf;
+        --input-bg: #2b2b2b;
+        --input-text: #fff;
+        --footer-bg: #121212;
+        --price-color: #4caf50;
+    }
+
+    .light-theme {
+        --bg-color: #f0f0f0;
+        --text-color: #333333;
+        --card-bg: #ffffff;
+        --border-color: #ccc;
+        --header-bg: #3054bf;
+        --input-bg: #ffffff;
+        --input-text: #333;
+        --footer-bg: #e6e6e6;
+        --price-color: #2e7d32;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: 0;
+        padding-bottom: 160px; /* Space for the fixed footer */
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* --- HEADER & INPUTS --- */
+    .header-input-section {
+        background-color: var(--header-bg);
+        padding: 20px 15px;
+        margin-bottom: 20px;
+        color: white;
+        position: relative;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    .header-input-section label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        margin-top: 10px;
+        display: block;
+        color: rgba(255,255,255,0.9);
+    }
+
+    .header-input-section input {
+        background-color: rgba(0,0,0,0.2);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 4px;
+    }
+    
+    .header-input-section input:focus {
+        background-color: rgba(0,0,0,0.4);
+        color: #fff;
+        border-color: #fff;
+    }
+
+    .input-error {
+        border: 2px solid #ff4444 !important;
+        background-color: rgba(255, 68, 68, 0.1) !important;
+    }
+
+    .theme-toggle {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0,0,0,0.2);
+        border: none;
+        color: white;
+        font-size: 20px;
+        padding: 5px 10px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+    /* --- LIST ITEMS --- */
+    .homepage-app-section {
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        padding: 10px;
+    }
+
+    .homepage-app-section h4 {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+        margin-top: 5px;
+        font-weight: bold;
+        color: var(--text-color);
+        padding-left: 5px;
+    }
+
+    .homepage-app-label {
+        display: flex !important;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border-color);
+        cursor: pointer;
+        font-weight: normal;
+        margin: 0;
+        color: var(--text-color);
+    }
+
+    .homepage-app-label:last-child {
+        border-bottom: none;
+    }
+
+    /* Price Column */
+    .price-tag {
+        font-family: monospace;
+        color: var(--price-color);
+        font-weight: bold;
+        font-size: 14px;
+        width: 75px; /* Fixed width for alignment */
+        min-width: 75px;
+        text-align: left;
+        padding-left: 5px;
+    }
+
+    .homepage-app-label input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        margin: 0 10px 0 0;
+        cursor: pointer;
+    }
+
+    .homepage-app-label img {
+        width: 24px; 
+        height: 24px;
+        margin-right: 10px;
+        margin-bottom: 0 !important;
+    }
+
+    /* --- OBSERVATIONS --- */
+    .observations-section {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .observations-section textarea {
+        width: 100%;
+        min-height: 100px;
+        background-color: var(--input-bg);
+        color: var(--input-text);
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 4px;
+        resize: vertical;
+    }
+
+    /* --- FOOTER --- */
+    .footer-action-section {
+        padding: 15px;
+        background-color: var(--footer-bg);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+        z-index: 100;
+        text-align: center;
+    }
+
+    .total-display {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--price-color);
+        margin-bottom: 10px;
+        display: block;
+    }
+    
+    .btn-enviar {
+        font-size: 18px;
+        font-weight: bold;
+        padding: 12px 0;
+        width: 90%;
+        max-width: 400px;
+        margin: 0 auto;
+        display: block;
+        background-color: #3054bf;
+        border: none;
+        color: white;
+        border-radius: 6px;
+    }
+
+    .btn-enviar:hover {
+        background-color: #213982;
+    }
+
+    /* Success Message Style */
+    .success-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column;
+        background-color: var(--bg-color);
+        color: var(--price-color);
+        text-align: center;
+        padding: 20px;
+    }
+    .success-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+    .success-text {
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--text-color);
+    }
+</style>
+</head>
+<body>
+
+<!-- HEADER: Inputs -->
+<div class="header-input-section">
+    <button id="themeToggle" class="theme-toggle" title="Alternar Tema">☀</button>
+    
+    <div class="container-fluid">
+        <div class="form-container">
+            <!-- Name -->
+            <label for="userName">Nome Completo</label>
+            <input type="text" class="form-control" id="userName" placeholder="Ex: João Silva">
+            
+            <!-- Email -->
+            <label for="userEmail">E-mail *</label>
+            <input type="email" class="form-control" id="userEmail" placeholder="joao@exemplo.com">
+
+            <!-- Cellphone (Numbers Only) -->
+            <label for="userPhone">Celular (Apenas números) *</label>
+            <input type="text" class="form-control" id="userPhone" placeholder="11999999999" maxlength="15">
+        </div>
+    </div>
+</div>
+
+<!-- CONTENT: App List -->
+<div class="container-fluid">
+    <div id="app-list-container"></div>
+
+    <!-- Observations Text Area -->
+    <div class="observations-section">
+        <h4>Observações</h4>
+        <textarea id="userObs" placeholder="Digite aqui observações adicionais ou instruções específicas..."></textarea>
+    </div>
+</div>
+
+<!-- FOOTER: Total & Button -->
+<div class="footer-action-section">
+    <span class="total-display" id="totalDisplay">Total R$ 0,00</span>
+    <button type="button" id="btnEnviar" class="btn btn-primary btn-enviar">ENVIAR</button>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+    // --- VARIABLES ---
+    const themeBtn = document.getElementById('themeToggle');
+    const body = document.body;
+    const totalDisplay = document.getElementById('totalDisplay');
+    const phoneInput = document.getElementById('userPhone');
+
+    // --- 1. THEME TOGGLE ---
+    themeBtn.addEventListener('click', function() {
+        body.classList.toggle('light-theme');
+        themeBtn.innerText = body.classList.contains('light-theme') ? '🌙' : '☀';
+    });
+
+    // --- 2. PHONE INPUT MASK (Numbers Only) ---
+    phoneInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+
+    // --- 3. TOTAL PRICE CALCULATION ---
+
+
+    // 1. DATA OBJECT
+    const appsData = {
+    webbrowsers: {
+        categoryName: "Web Browsers",
+        itens: {
+            chrome: {
+                name: "Chrome",
+                value: "Google.Chrome",
+                link: "https://ninite.com/static/app_icons2/R423MXEYO4NJRC5YDPOEU362A4.png",
+                price: 10.00
+            },
+            opera: {
+                name: "Opera",
+                value: "Opera.Opera",
+                link: "https://ninite.com/static/app_icons2/EZ36SHVKOHLPDFAM4IC63DFOKU.png",
+                price: 12.00
+            },
+            firefox: {
+                name: "Firefox",
+                value: "Mozilla.Firefox",
+                link: "https://ninite.com/static/app_icons2/GXFFNGKNKZZTPF6U4IOSWAJDVU.png",
+                price: 10.00
+            },
+            edge: {
+                name: "Edge",
+                value: "Microsoft.Edge",
+                link: "https://ninite.com/static/app_icons2/DYEG7BMSZSDD7QCOZ7FZ7ZN27Y.png",
+                price: 10.00
+            },
+            brave: {
+                name: "Brave",
+                value: "Brave.Brave",
+                link: "https://ninite.com/static/app_icons2/PLD56XG5YU5IK76KGOZWM3DTB4.png",
+                price: 12.50
+            }
+        }
+    },
+    messaging: {
+        categoryName: "Messaging",
+        itens: {
+            zoom: {
+                name: "Zoom",
+                value: "Zoom.Zoom",
+                link: "https://ninite.com/static/app_icons2/PJTYHUUK2NBMDWBSTCHT3ZHCEA.png",
+                price: 15.00
+            },
+            discord: {
+                name: "Discord",
+                value: "Discord.Discord",
+                link: "https://ninite.com/static/app_icons2/5BU6KXYGWSLK4XSZLZIF5MQKUQ.png",
+                price: 15.00
+            },
+            teams: {
+                name: "Teams",
+                value: "Microsoft.Teams",
+                link: "https://ninite.com/static/app_icons2/C4XO3QINCXSX5VV7HGXAJCEV6E.png",
+                price: 20.00
+            }
+        }
+    },
+    media: {
+        categoryName: "Media",
+        itens: {
+            vlc: {
+                name: "VLC",
+                value: "VideoLAN.VLC",
+                link: "https://ninite.com/static/app_icons2/AARRKXIDTYQEB43EI4SESMU6XU.png",
+                price: 10.00
+            },
+            spotify: {
+                name: "Spotify",
+                value: "Spotify.Spotify",
+                link: "https://ninite.com/static/app_icons2/X4XEFHP4PS5JTTFLD5GZ736MSE.png",
+                price: 10.00
+            },
+            audacity: {
+                name: "Audacity",
+                value: "Audacity.Audacity",
+                link: "https://ninite.com/static/app_icons2/ZV53RR2KSRN2XUQDGKJVK6BH2Y.png",
+                price: 12.00
+            }
+        }
+    },
+    runtimes: {
+        categoryName: "Runtimes",
+        itens: {
+            dotnet: {
+                name: ".NET Desktop 8",
+                value: "Microsoft.DotNet.DesktopRuntime.8",
+                link: "https://ninite.com/static/app_icons/dotnet-1863f6ffe9fdc1d4fadfb9b16cf37dfd.png",
+                price: 25.00
+            },
+            java: {
+                name: "Java Runtime",
+                value: "Oracle.JavaRuntimeEnvironment",
+                link: "https://ninite.com/static/app_icons2/PWKO3B6XDUE5FYSJDKP7WWPE5M.png",
+                price: 25.00
+            }
+        }
+    },
+    imaging: {
+        categoryName: "Imaging",
+        itens: {
+            krita: {
+                name: "Krita",
+                value: "KDE.Krita",
+                link: "https://ninite.com/static/app_icons2/I34XNAOB7RUG6CFUNMATLL6GW4.png",
+                price: 20.00
+            },
+            blender: {
+                name: "Blender",
+                value: "BlenderFoundation.Blender",
+                link: "https://ninite.com/static/app_icons2/CREZUGUDCUDHBWHSJYTZLKUS2M.png",
+                price: 30.00
+            },
+            paintnet: {
+                name: "Paint.NET",
+                value: "dotPDN.PaintDotNet",
+                link: "https://ninite.com/static/app_icons2/X4EQ57DBOI3YGMP67VLIZA2OFU.png",
+                price: 15.00
+            },
+            gimp: {
+                name: "GIMP",
+                value: "GIMP.GIMP",
+                link: "https://ninite.com/static/app_icons2/RLDUTCFVUHK6WCBU4TJXR5DXBE.png",
+                price: 15.00
+            }
+        }
+    },
+    security: {
+        categoryName: "Security",
+        itens: {
+            malwarebytes: {
+                name: "Malwarebytes",
+                value: "Malwarebytes.Malwarebytes",
+                link: "https://ninite.com/static/app_icons2/YNTAGZLB2E5CBSUKR7O5LKME74.png",
+                price: 30.00
+            },
+            avast: {
+                name: "Avast",
+                value: "Avast.AvastFreeAntivirus",
+                link: "https://ninite.com/static/app_icons2/XEJG4KBIORJAJQNFVDACDWJVO4.png",
+                price: 30.00
+            }
+        }
+    },
+    documents: {
+        categoryName: "Documents",
+        itens: {
+            foxit: {
+                name: "Foxit Reader",
+                value: "Foxit.FoxitReader",
+                link: "https://ninite.com/static/app_icons2/VWKMB53R3PPNV2VZOJTD54VI2I.png",
+                price: 15.00
+            },
+            libreoffice: {
+                name: "LibreOffice",
+                value: "LibreOffice.LibreOffice",
+                link: "https://ninite.com/static/app_icons2/WMDH233EOQ2BHQXVBJ6BJPGMV4.png",
+                price: 20.00
+            }
+        }
+    },
+    utilities: {
+        categoryName: "Utilities & Other",
+        itens: {
+            teamviewer: {
+                name: "TeamViewer",
+                value: "TeamViewer.TeamViewer",
+                link: "https://ninite.com/static/app_icons2/NQ7A6XLSO6MEWKKVSYP5PVAOWM.png",
+                price: 20.00
+            },
+            anydesk: {
+                name: "AnyDesk",
+                value: "AnyDeskSoftwareGmbH.AnyDesk",
+                link: "https://ninite.com/static/app_icons2/5Z7TFQBFUQREUBBJFOC3YBPVWY.png",
+                price: 20.00
+            },
+            sevenzip: {
+                name: "7-Zip",
+                value: "7zip.7zip",
+                link: "https://ninite.com/static/app_icons2/J2GZ5DNECZISS4HIZIEVE74BDQ.png",
+                price: 10.00
+            },
+            winrar: {
+                name: "WinRAR",
+                value: "WinRAR.WinRAR",
+                link: "https://ninite.com/static/app_icons2/NRI2CC4JKEOQVLNYMCPEFOQK7M.png",
+                price: 10.00
+            },
+            steam: {
+                name: "Steam",
+                value: "Valve.Steam",
+                link: "https://ninite.com/static/app_icons/Steam-366e162ab72bf4750858a9a62e4de040.png",
+                price: 10.00
+            },
+            vscode: {
+                name: "VS Code",
+                value: "Microsoft.VisualStudioCode",
+                link: "https://ninite.com/static/app_icons2/VU4TI533VCF2OQAFM67LLLV7YI.png",
+                price: 0.00
+            }
+        }
+    }
+};
+
+    // 2. GENERATOR FUNCTION
+    function generateAppList() {
+        const container = document.getElementById('app-list-container');
+        container.innerHTML = '<ul class="list-unstyled" id="generated-ul"></ul>';
+        const ul = document.getElementById('generated-ul');
+
+        for (const categoryKey in appsData) {
+            const category = appsData[categoryKey];
+            
+            // Create Category Section (li)
+            const categoryLi = document.createElement('li');
+            categoryLi.className = 'homepage-app-section';
+            
+            // Header
+            const h4 = document.createElement('h4');
+            h4.textContent = category.categoryName;
+            categoryLi.appendChild(h4);
+
+            // Inner List
+            const innerUl = document.createElement('ul');
+            innerUl.className = 'list-unstyled';
+
+            // Items Loop
+            for (const itemKey in category.itens) {
+                const item = category.itens[itemKey];
+                const itemLi = document.createElement('li');
+
+                // Format price to pt-BR (R$ XX,XX) for display
+                const formattedPrice = item.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+                // Create Label
+                const label = document.createElement('label');
+                label.className = 'homepage-app-label';
+
+                // HTML Structure for the item
+                label.innerHTML = `
+                    <input type="checkbox" name="apps" value="${item.value}" data-price="${item.price}">
+                    <img src="${item.link}" alt="${item.name} icon"> ${item.name}
+                    <span class="price-tag">${formattedPrice}</span>
+                `;
+
+                itemLi.appendChild(label);
+                innerUl.appendChild(itemLi);
+            }
+
+            categoryLi.appendChild(innerUl);
+            ul.appendChild(categoryLi);
+        }
+
+        
+
+    }
+    
+
+    // 3. INITIALIZE
+    // Run generation immediately
+    generateAppList();
+    let checkboxes = document.querySelectorAll('input[name="apps"]');
+
+    function updateTotal() {
+        let total = 0;
+        checkboxes.forEach(box => {
+            if (box.checked) {
+                total += parseFloat(box.getAttribute('data-price') || 0);
+            }
+        });
+        
+        // Format to BRL Currency
+        totalDisplay.innerText = "Total " + total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        return total;
+    };
+
+    checkboxes.forEach(box => {
+        box.addEventListener('change', updateTotal);
+    });
+
+
+    // --- 4. SUBMIT LOGIC ---
+    document.getElementById('btnEnviar').addEventListener('click', function() {
+        // Inputs
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+        const phone = document.getElementById('userPhone').value.trim();
+        const obs = document.getElementById('userObs').value.trim();
+
+        // Validation
+        let isValid = true;
+        
+        // Name Check
+        if (!name) { document.getElementById('userName').classList.add('input-error'); isValid = false; } 
+        else { document.getElementById('userName').classList.remove('input-error'); }
+
+        // Email Check (Basic Regex)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) { document.getElementById('userEmail').classList.add('input-error'); isValid = false; } 
+        else { document.getElementById('userEmail').classList.remove('input-error'); }
+
+        // Phone Check
+        if (!phone) { document.getElementById('userPhone').classList.add('input-error'); isValid = false; } 
+        else { document.getElementById('userPhone').classList.remove('input-error'); }
+
+        if (!isValid) {
+            alert("Por favor, preencha todos os campos obrigatórios corretamente.");
+            return;
+        }
+
+        // Generate Winget Command
+        const checkedBoxes = document.querySelectorAll('input[name="apps"]:checked');
+        let values = [];
+        checkedBoxes.forEach(box => values.push('"' + box.value + '"'));
+
+        let finalCommand = "No apps selected";
+        if (values.length > 0) {
+            const listString = values.join(', ');
+            finalCommand = listString + ' | ForEach-Object { winget install $_ --silent --accept-package-agreements }';
+        }
+
+        // Get Total Price formatted
+        const totalPrice = document.getElementById('totalDisplay').innerText;
+
+        // --- CONSOLE OUTPUT (Requirement 6) ---
+        console.log("--- ORDER DETAILS ---");
+        console.log("Command:", finalCommand);
+        console.log("Total:", totalPrice);
+        console.log("Name:", name);
+        console.log("Email:", email);
+        console.log("Cellphone:", phone);
+        console.log("Observations:", obs);
+        fetch('https://script.google.com/macros/s/AKfycbxzX7jsAd7yZb9l8kwF-A--P0Ne6OULLq9VoCS52j2fWFTuOhWCSFtM9va9s-wpuwY/exec', {
+            method: 'POST',
+            body: JSON.stringify({
+                command: finalCommand,
+                totalPrice: totalPrice,
+                name: name,
+                email: email,
+                cellphone: phone,
+                observations: obs
+            })
+        });
+        // --- REPLACE SCREEN (Requirement 7) ---
+        document.body.innerHTML = `
+            <div class="success-container">
+                <div class="success-icon">✅</div>
+                <div class="success-text">Sua escolha foi enviada para o técnico!</div>
+            </div>
+        `;
+    });
+
+
+</script>
+
+</body>
+</html>
